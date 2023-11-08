@@ -1,13 +1,28 @@
 ---
 - name: Build, Push and Run Docker Image for Python App
   hosts: localhost
-  gather_facts: yes
+  become: no
+  gather_facts: no
+
   vars:
-    image_name: "rodinu23/homework"
+    image_name: "rodinu23/telerik"
     image_tag: "ansible-python-app-1.0"
-    listen_port: "80"
-    build_context: "/home/master/Telerik/Ansible-HW/devops-programme"
+    build_context: "/tmp/app"
+
   tasks:
+    - name: Create {{ build_context }} directory
+      file:
+        name: "{{ build_context }}"
+        state: directory
+        mode: 0755
+
+    - name: Checkout repository
+      git:
+        repo: git@github.com:U23Rodin/devops-programme
+        dest: "{{ build_context}}"
+        version: main
+        update: yes
+
     - name: Build Docker image
       community.general.docker_image:
         name: "{{ image_name }}"
@@ -23,19 +38,18 @@
         push: yes
         source: local
 
-    - name: Remove container in case it already exists
-      community.general.docker_container:
-        name: "python_app"
-        state: absent
-      ignore_errors: yes
-
     - name: Run the container from the image
       community.general.docker_container:
         name: "python_app"
         image: "{{ image_name }}:{{ image_tag }}"
         state: started
+        auto_remove: yes
         published_ports:
-          - "8080:{{ listen_port }}"
+          - "8080:80"
         env:
-          PORT: "{{ listen_port }}"
-    
+          PORT: "80"
+        healthcheck:
+          test: ["CMD", "curl", "--fail", "http://localhost:80"]
+          interval: 10s
+          retries: 3
+          start_period: 5s
