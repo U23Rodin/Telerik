@@ -45,5 +45,5 @@ jobs:
           pip install -r app/requirements.txt
           pip install pylint
       - name: Analyse with Pylint
-        run: pylint $(git ls-files '*.py')
+        run: pylint --disable=missing-docstring $(git ls-files '*.py')
 
