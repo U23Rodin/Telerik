@@ -1,0 +1,17 @@
+---
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  editorconfig-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Check .editorconfig
+        uses: editorconfig-checker/action-editorconfig-checker@main
+      - run: editorconfig-checker
