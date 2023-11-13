@@ -60,7 +60,7 @@ jobs:
           ignore: node_modules
           version: 0.28.1
 
-  Code Unittest:
+  code-unittest:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
