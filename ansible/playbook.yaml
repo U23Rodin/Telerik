@@ -9,6 +9,9 @@
     image_tag: "ansible-python-app-1.0"
     build_context: "/tmp/app"
 
+  vars_files:
+    - secrets.yaml
+
   tasks:
     - name: Create {{ build_context }} directory
       file:
@@ -30,6 +33,11 @@
         build:
           path: "{{ build_context }}"
         source: build
+
+    - name: Log in to DockerHub
+      community.general.docker_login:
+        username: "{{ dockerhub_username }}"
+        password: "{{ dockerhub_password }}"
 
     - name: Push Docker Image
       community.general.docker_image:
