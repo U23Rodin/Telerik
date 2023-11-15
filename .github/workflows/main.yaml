@@ -119,10 +119,12 @@ jobs:
         uses: actions/checkout@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Build
+      - name: Build docker image
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
+          load: true
           tags: rodinu23/telerik:${{ github.sha }}
       - name: Run Trivy
         uses: aquasecurity/trivy-action@master
@@ -130,7 +132,6 @@ jobs:
           image-ref: rodinu23/telerik:${{ github.sha }}
       - name: Generate tarball from image
         run: docker save -o vuln-image.tar 'rodinu23/telerik:${{ github.sha }}'
-
       - name: Run Trivy scanner in tarball mode
         uses: aquasecurity/trivy-action@master
         with:
