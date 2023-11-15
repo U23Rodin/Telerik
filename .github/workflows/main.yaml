@@ -104,7 +104,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Analyze with Snyk
-        working-directory: ./app
         uses: snyk/actions/python-3.10@master
+        with:
+          command: test
+          path: 'app/'
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
