@@ -111,3 +111,28 @@ jobs:
           command: test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  build-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build
+        with:
+          context: .
+          file: ./Dockerfile
+          tags: rodinu23/telerik:${{ github.sha }}
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: rodinu23/telerik:${{ github.sha }}
+      - name: Generate tarball from image
+        run: docker save -o vuln-image.tar 'rodinu23/telerik:${{ github.sha }}'
+
+      - name: Run Trivy scanner in tarball mode
+        uses: aquasecurity/trivy-action@master
+        with:
+        input: /github/workspace/vuln-image.tar
+        severity: 'CRITICAL,HIGH'
