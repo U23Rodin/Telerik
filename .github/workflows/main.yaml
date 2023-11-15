@@ -103,10 +103,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Analyze with Snyk
-        uses: snyk/actions/python-3.10@master
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          command: test
-          path: 'app/'
+          python-version: '3.10'
+
+      - name: Install Snyk
+        run: pip install snyk
+
+      - name: Run Snyk in the app directory
+        run: |
+          cd app/
+          snyk test --all-projects
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
